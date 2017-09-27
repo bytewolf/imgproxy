@@ -1,0 +1,21 @@
+language: go
+go:
+  - 1.6
+  - 1.7
+  - 1.8
+  - 1.9
+  - tip
+env:
+  - VIPS_URL=https://github.com/jcupitt/libvips/releases/download/v8.4.6/vips-8.4.6.tar.gz
+  - VIPS_URL=https://github.com/jcupitt/libvips/releases/download/v8.5.8/vips-8.5.8.tar.gz
+install:
+  - go get -u gopkg.in/alecthomas/gometalinter.v1
+  - gometalinter.v1 --install
+  - apt-get -qq update
+  - apt-get install build-essential libxml2-dev libfftw3-dev libmagickwand-dev libopenexr-dev liborc-0.4-0 gobject-introspection libgsf-1-dev libglib2.0-dev liborc-0.4-dev
+  - wget VIPS_URL -O vips.tag.gz
+  - tar -xzvf vips.tar.gz
+  - pushd vips && ./configure --prefix=/usr && make && sudo make install && popd
+script:
+  - gometalinter.v1 --vendor --disable-all --enable=vet --enable=vetshadow --enable=golint ./...
+  - go build
